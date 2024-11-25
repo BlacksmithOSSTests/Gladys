@@ -8,12 +8,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     name: Build and publish apidoc documentation
     steps:
       - uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: './package.json'
           cache: 'npm'

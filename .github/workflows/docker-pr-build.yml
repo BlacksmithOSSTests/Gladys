@@ -13,12 +13,12 @@ concurrency:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -44,14 +44,14 @@ jobs:
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -96,12 +96,12 @@ jobs:
           ## It's not that dangerous to do it, and it's the best tradeoff we could find
   cypress-run:
     name: Cypress run
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -125,12 +125,12 @@ jobs:
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -156,7 +156,7 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3

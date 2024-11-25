@@ -7,12 +7,12 @@ on:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -38,12 +38,12 @@ jobs:
           npm run compare-translations
   build-front:
     name: Front build
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -68,14 +68,14 @@ jobs:
           path: front/build
   test-server:
     name: Server test
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'

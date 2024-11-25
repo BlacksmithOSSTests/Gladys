@@ -15,12 +15,12 @@ on:
 jobs:
   build-front:
     name: Front build
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -41,7 +41,7 @@ jobs:
   docker:
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
