@@ -96,7 +96,16 @@ jobs:
           ## It's not that dangerous to do it, and it's the best tradeoff we could find
   cypress-run:
     name: Cypress run
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    strategy:
+      matrix:
+        runner: [
+          "ubuntu-latest",
+          "blacksmith-2vcpu-ubuntu-2204",
+          "blacksmith-4vcpu-ubuntu-2204",
+          "blacksmith-8vcpu-ubuntu-2204",
+          "blacksmith-16vcpu-ubuntu-2204"
+        ]
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
