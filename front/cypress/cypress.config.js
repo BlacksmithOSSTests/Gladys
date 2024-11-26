@@ -3,8 +3,8 @@ const os = require('os');
 
 const VARIABLES = {};
 
-// Calculate half the logical CPUs, rounding down
-const workerCount = Math.max(1, Math.floor(os.cpus().length / 2));
+// Calculate half the logical CPUs, rounding up
+const workerCount = Math.max(1, Math.ceil(os.cpus().length / 2));
 
 module.exports = defineConfig({
   // setupNodeEvents can be defined in either
