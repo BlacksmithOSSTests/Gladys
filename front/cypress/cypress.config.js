@@ -1,6 +1,10 @@
 const { defineConfig } = require('cypress');
+const os = require('os');
 
 const VARIABLES = {};
+
+// Calculate half the logical CPUs, rounding up
+const workerCount = Math.max(1, Math.ceil(os.cpus().length / 2));
 
 module.exports = defineConfig({
   // setupNodeEvents can be defined in either
@@ -32,6 +36,9 @@ module.exports = defineConfig({
 
       const i18n = require(`../src/config/i18n/${language}.json`);
       config.env.i18n = i18n;
+
+      // Set worker count in Cypress environment
+      config.env.workerCount = workerCount;
 
       return config;
     },

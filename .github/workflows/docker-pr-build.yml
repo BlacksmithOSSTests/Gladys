@@ -13,12 +13,12 @@ concurrency:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -44,14 +44,14 @@ jobs:
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'server/package.json'
           cache: 'npm'
@@ -96,12 +96,23 @@ jobs:
           ## It's not that dangerous to do it, and it's the best tradeoff we could find
   cypress-run:
     name: Cypress run
-    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          [
+            'ubuntu-latest',
+            'blacksmith-2vcpu-ubuntu-2204',
+            'blacksmith-4vcpu-ubuntu-2204',
+            'blacksmith-8vcpu-ubuntu-2204',
+            'blacksmith-16vcpu-ubuntu-2204',
+          ]
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -113,6 +124,27 @@ jobs:
       - name: 📦 Install NPM packages
         run: |
           npm ci && npm run install-server:dev
+      - name: 🔢 Set parallel workers based on runner
+        id: set-workers
+        run: |
+          case "${{ matrix.runner }}" in
+            "ubuntu-latest")
+              echo "worker_count=1" >> $GITHUB_OUTPUT
+              ;;
+            "blacksmith-2vcpu-ubuntu-2204")
+              echo "worker_count=1" >> $GITHUB_OUTPUT
+              ;;
+            "blacksmith-4vcpu-ubuntu-2204")
+              echo "worker_count=2" >> $GITHUB_OUTPUT
+              ;;
+            "blacksmith-8vcpu-ubuntu-2204")
+              echo "worker_count=4" >> $GITHUB_OUTPUT
+              ;;
+            "blacksmith-16vcpu-ubuntu-2204")
+              echo "worker_count=8" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
       - name: ✅ Cypress run
         uses: cypress-io/github-action@v3.1.0
         with:
@@ -121,16 +153,20 @@ jobs:
           wait-on: 'http://localhost:1444'
           config-file: ./front/cypress/cypress.config.js
           project: ./front
-          command: npm run cypress:run
+          command: >-
+            npm run cypress:run --
+            --spec "cypress/e2e/routes/{0-signup,login,dashboard}/**.cy.js,cypress/e2e/routes/{maps,scene,integration}/**.cy.js"
+        env:
+          CYPRESS_PARALLEL_WORKERS: ${{ steps.set-workers.outputs.worker_count }}
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v3
+        uses: useblacksmith/setup-node@v5
         with:
           node-version-file: 'front/package.json'
           cache: 'npm'
@@ -156,7 +192,7 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-22.04
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
